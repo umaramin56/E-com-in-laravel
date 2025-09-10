@@ -1,10 +1,8 @@
-<div class="card">
-  <div class="card-header">
-    Featured
-  </div>
-  <div class="card-body">
-    <h5 class="card-title">Special title treatment</h5>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-primary">Go somewhere</a>
-  </div>
-</div>
+<footer class="bg-light mt-5 py-4 border-top">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <p class="mb-2 mb-md-0 text-muted">© {{ date('Y') }} E-Com. All rights reserved.</p>
+            <a href="#" class="btn btn-sm btn-primary">Contact Us</a>
+        </div>
+    </div>
+</footer>
