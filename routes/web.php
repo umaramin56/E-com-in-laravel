@@ -19,3 +19,9 @@ Route::get('/', [ProductController::class, 'index']);
 Route::get('detail/{id}', [ProductController::class, 'detail']);
 Route::get('search', [ProductController::class, 'search']);
 Route::post('add_to_cart', [ProductController::class, 'addToCart'])->middleware('userauth');
+// routes/web.php
+
+Route::get('/cart', [ProductController::class, 'cart'])->name('cart');  // (optional) ->middleware('userauth')
+Route::post('/cart/remove/{id}', [ProductController::class, 'removeFromCart'])->name('cart.remove');
+
+
