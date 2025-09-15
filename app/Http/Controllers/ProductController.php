@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Cart;
 use Illuminate\Support\Facades\Session;   // <-- ADD THIS
 use Illuminate\Support\Facades\DB;
+use App\Models\Order;
 
 class ProductController extends Controller
 {
@@ -69,5 +70,82 @@ class ProductController extends Controller
 
         DB::table('cart')->where('id', $cartId)->delete();
         return back()->with('success', 'Item removed from cart.');
+    }
+    public function orderNew()
+{
+    if (!Session::has('user')) return redirect('/login');
+    $userId = Session::get('user')['id'];
+
+    $items = DB::table('cart')
+        ->join('products', 'cart.product_id', '=', 'products.id')
+        ->select('products.*', 'cart.id as cart_id')
+        ->where('cart.user_id', $userId)
+        ->get();
+
+    $price     = $items->sum('price');           // subtotal
+    $tax       = 0;                              // video ke hisaab se 0
+    $delivery  = 100;                            // flat
+    $total     = $price + $tax + $delivery;
+
+    return view('order_now', compact('items','price','tax','delivery','total'));
+}
+
+ // ⬇️ NEW: Replace your old placeOrder() with this one
+    public function placeOrder(Request $req){
+        if (!Session::has('user')) return redirect('/login');
+
+        $req->validate([
+            'address' => 'required|min:6',
+            'payment' => 'required|in:online,cod',
+        ]);
+
+        $userId = Session::get('user')['id'];
+
+        $productIds = DB::table('cart')
+            ->where('user_id', $userId)
+            ->pluck('product_id');
+
+        if ($productIds->isEmpty()) {
+            return back()->with('error', 'Your cart is empty.');
+        }
+
+        // simple: har product ke liye aik order row
+        foreach ($productIds as $pid) {
+            DB::table('orders')->insert([
+                'user_id'        => $userId,
+                'product_id'     => $pid,
+                'status'         => 'pending',
+                'payment_method' => $req->payment,   // online / cod
+                'payment_status' => 'pending',
+                'address'        => $req->address,
+                'created_at'     => now(),
+                'updated_at'     => now(),
+            ]);
+        }
+
+        // cart empty
+        DB::table('cart')->where('user_id', $userId)->delete();
+
+        return redirect('/orders')->with('success', 'Order placed successfully!');
+    }
+
+    // ⬇️ NEW: Orders listing page
+    public function orders(){
+        if (!Session::has('user')) return redirect('/login');
+
+        $userId = Session::get('user')['id'];
+
+        $orders = DB::table('orders')
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->select(
+                'orders.id','orders.status','orders.payment_method',
+                'orders.payment_status','orders.address','orders.created_at',
+                'products.name','products.price','products.gallery'
+            )
+            ->where('orders.user_id', $userId)
+            ->orderBy('orders.id','desc')
+            ->get();
+
+        return view('orders', compact('orders'));
     }
 }

@@ -24,4 +24,10 @@ Route::post('add_to_cart', [ProductController::class, 'addToCart'])->middleware(
 Route::get('/cart', [ProductController::class, 'cart'])->name('cart');  // (optional) ->middleware('userauth')
 Route::post('/cart/remove/{id}', [ProductController::class, 'removeFromCart'])->name('cart.remove');
 
+Route::get('ordernow', [ProductController::class, 'orderNew'])->name('order.now')->middleware('userauth');
+Route::post('order/place', [ProductController::class, 'placeOrder'])->name('order.place')->middleware('userauth');
+
+Route::get('/orders', [ProductController::class, 'orders'])->name('orders')->middleware('userauth');
+
+
 

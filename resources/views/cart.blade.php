@@ -52,7 +52,8 @@
 
     <div class="d-flex justify-content-end align-items-center mt-3 gap-3">
       <h5 class="m-0">Subtotal: <span class="text-primary">PKR {{ number_format($subtotal, 0) }}</span></h5>
-      <a href="#" class="btn btn-dark">Checkout</a>
+      <a href="{{ route('order.now') }}" class="btn btn-dark">Checkout</a>
+
     </div>
   @else
     <p class="text-muted">Your cart is empty.</p>
